@@ -1,0 +1,86 @@
+﻿@page "/marques"
+@using BlazorApp.Models
+@using BlazorApp.ViewModels
+@inject HttpClient Http
+
+<h3>Gestion des Marques</h3>
+
+@if (vm.Marques == null)
+{
+    <p><em>Chargement...</em></p>
+}
+else
+{
+    <button class="btn btn-success mb-3" @onclick="New">Nouveau</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in vm.Marques)
+            {
+                <tr>
+                    <td>@m.NomMarque</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" @onclick="() => vm.ShowDetails(m.IdMarque, m.NomMarque)">Détails</button>
+                        <button class="btn btn-sm btn-primary" @onclick="() => Edit(m.IdMarque)">Modifier</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => vm.DeleteMarque(m.IdMarque)">Supprimer</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<Modal IsVisible="@vm.IsDetailsPopupVisible" OnClose="vm.CloseDetails">
+    @if (vm.SelectedMarqueProduits != null)
+    {
+        <h4>Produits de la marque "@vm.SelectedMarqueNom"</h4>
+        <ul>
+            @foreach (var p in vm.SelectedMarqueProduits)
+            {
+                <li>@p.NomProduit - @p.Type - @p.Marque</li>
+            }
+        </ul>
+    }
+</Modal>
+
+@if (vm.EditingMarque != null)
+{
+    <hr />
+    <h4>@(vm.EditingMarque.IdMarque == 0 ? "Ajouter une marque" : "Modifier une marque")</h4>
+
+    <div class="form-group">
+        <label>Nom :</label>
+        <input class="form-control" @bind="vm.EditingMarque.NomMarque" />
+    </div>
+
+    <button class="btn btn-success" @onclick="Save">Enregistrer</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Annuler</button>
+}
+
+@code {
+    private MarqueViewModel vm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vm = new MarqueViewModel(Http);
+        await vm.LoadMarques();
+    }
+
+    private void New() => vm.NewMarque();
+    private void Cancel() => vm.CancelEdit();
+    private async Task Save() => await vm.SaveMarque();
+    private async Task Edit(int id)
+    {
+        var marque = vm.Marques?.FirstOrDefault(m => m.IdMarque == id);
+        if (marque != null)
+        {
+            vm.EditingMarque = marque;
+        }
+    }
+}

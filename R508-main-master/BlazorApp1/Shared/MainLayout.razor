@@ -1,0 +1,36 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="content px-4">
+            @Body
+        </div>
+    </main>
+</div>
+
+<style>
+    .page {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 220px;
+        background-color: #343a40;
+        color: white;
+        padding: 1rem;
+    }
+
+    main {
+        flex: 1;
+        background: #f8f9fa;
+    }
+</style>
+
+@code {
+
+}

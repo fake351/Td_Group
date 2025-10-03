@@ -1,0 +1,144 @@
+﻿@page "/produits"
+@using BlazorApp.Models
+@using BlazorApp.ViewModels
+@using BlazorApp.Shared
+@inject HttpClient Http
+
+<h3>Gestion des Produits</h3>
+
+@if (vm.Produits == null)
+{
+    <p><em>Chargement...</em></p>
+}
+else
+{
+    <button class="btn btn-success mb-3" @onclick="NewProduct">Nouveau</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Marque</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in vm.Produits)
+            {
+                <tr>
+                    <td>@p.NomProduit</td>
+                    <td>@p.Type</td>
+                    <td>@p.Marque</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" @onclick="() => vm.ShowDetails(p.IdProduit)">Détails</button>
+                        <button class="btn btn-sm btn-primary" @onclick="() => Edit(p.IdProduit)">Modifier</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => vm.DeleteProduit(p.IdProduit)">Supprimer</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <Modal IsVisible="@vm.IsDetailsPopupVisible" OnClose="vm.CloseDetails">
+        @if (vm.SelectedProduct != null)
+        {
+            <h4>Détails du produit</h4>
+            <p><b>Nom :</b> @vm.SelectedProduct.NomProduit</p>
+            <p><b>Type :</b> @vm.SelectedProduct.Type</p>
+            <p><b>Marque :</b> @vm.SelectedProduct.Marque</p>
+            <p><b>Description :</b> @vm.SelectedProduct.Description</p>
+            <p><b>Stock Réel :</b> @vm.SelectedProduct.StockReel</p>
+            <p><b>Stock Min :</b> @vm.SelectedProduct.StockMin</p>
+            <p><b>Stock Max :</b> @vm.SelectedProduct.StockMax</p>
+            @if (!string.IsNullOrEmpty(vm.SelectedProduct.Uriphoto))
+            {
+                <img src="@vm.SelectedProduct.Uriphoto" alt="@vm.SelectedProduct.Nomphoto" width="150" />
+            }
+        }
+    </Modal>
+}
+
+@if (vm.EditingProduct != null)
+{
+    <hr />
+    <h4>@(vm.EditingProduct.IdProduit == 0 ? "Ajouter un produit" : "Modifier le produit")</h4>
+
+    <div class="form-group">
+        <label>Nom :</label>
+        <input class="form-control" @bind="vm.EditingProduct.NomProduit" placeholder="Nom Produit" />
+    </div>
+
+    <div class="form-group">
+        <label>Type :</label>
+        <input class="form-control" @bind="vm.EditingProduct.Type" placeholder="Saisir un type (sera créé s'il n'existe pas)" />
+    </div>
+
+    <div class="form-group">
+        <label>Marque :</label>
+        <input class="form-control" @bind="vm.EditingProduct.Marque" placeholder="Saisir une marque (sera créée si inexistante)" />
+    </div>
+
+    <div class="form-group">
+        <label>Description :</label>
+        <textarea class="form-control" @bind="vm.EditingProduct.Description" placeholder="Description"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Nom Photo :</label>
+        <input class="form-control" @bind="vm.EditingProduct.Nomphoto" placeholder="Nom Photo" />
+    </div>
+
+    <div class="form-group">
+        <label>Stock Réel :</label>
+        <input type="number" class="form-control" @bind="vm.EditingProduct.StockReel" />
+    </div>
+
+    <div class="form-group">
+        <label>Stock Min :</label>
+        <input type="number" class="form-control" @bind="vm.EditingProduct.StockMin" />
+    </div>
+
+    <div class="form-group">
+        <label>Stock Max :</label>
+        <input type="number" class="form-control" @bind="vm.EditingProduct.StockMax" />
+    </div>
+
+    <button class="btn btn-success" @onclick="Save">Enregistrer</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Annuler</button>
+}
+
+@code {
+    private ProduitViewModel vm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vm = new ProduitViewModel(Http);
+        await vm.LoadProduits();
+    }
+
+    private void NewProduct()
+    {
+        vm.NewProduit(); // méthode à ajouter dans ton ViewModel
+    }
+
+    private async Task Edit(int id)
+    {
+        await vm.EditProduct(id);
+    }
+
+    private async Task Delete(int id)
+    {
+        await vm.DeleteProduit(id);
+    }
+
+    private async Task Save()
+    {
+        await vm.SaveProduit(); 
+    }
+
+    private void Cancel()
+    {
+        vm.CancelEdit();
+    }
+}

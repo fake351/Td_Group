@@ -1,0 +1,79 @@
+﻿@page "/typesproduits"
+@using BlazorApp.Models
+@using BlazorApp.ViewModels
+@inject HttpClient Http
+
+<h3>Gestion des Types de Produits</h3>
+
+@if (vm.Types == null)
+{
+    <p><em>Chargement...</em></p>
+}
+else
+{
+    <button class="btn btn-success mb-3" @onclick="NewType">Nouveau</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in vm.Types)
+            {
+                <tr>
+                    <td>@t.NomTypeProduit</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" @onclick="() => vm.ShowDetails(t.IdTypeProduit, t.NomTypeProduit)">Détails</button>
+                        <button class="btn btn-sm btn-primary" @onclick="() => EditType(t.IdTypeProduit)">Modifier</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => vm.DeleteType(t.IdTypeProduit)">Supprimer</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<Modal IsVisible="@vm.IsDetailsPopupVisible" OnClose="vm.CloseDetails">
+    @if (vm.SelectedTypeProduits != null)
+    {
+        <h4>Produits du type "@vm.SelectedTypeNom"</h4>
+        <ul>
+            @foreach (var p in vm.SelectedTypeProduits)
+            {
+                <li>@p.NomProduit - @p.Marque - @p.Type</li>
+            }
+        </ul>
+    }
+</Modal>
+
+@if (vm.EditingType != null)
+{
+    <hr />
+    <h4>@(vm.EditingType.IdTypeProduit == 0 ? "Ajouter un type" : "Modifier un type")</h4>
+
+    <div class="form-group">
+        <label>Nom :</label>
+        <input class="form-control" @bind="vm.EditingType.NomTypeProduit" />
+    </div>
+
+    <button class="btn btn-success" @onclick="Save">Enregistrer</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Annuler</button>
+}
+
+@code {
+    private TypeProduitViewModel vm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vm = new TypeProduitViewModel(Http);
+        await vm.LoadTypes();
+    }
+
+    private void NewType() => vm.NewType();
+    private void Cancel() => vm.CancelEdit();
+    private async Task Save() => await vm.SaveType();
+    private async Task EditType(int id) => await vm.EditType(id);
+}

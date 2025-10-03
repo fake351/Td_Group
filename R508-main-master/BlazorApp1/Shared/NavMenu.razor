@@ -1,0 +1,59 @@
+﻿<h3>Menu de Navigation</h3>
+
+@* Shared/NavMenu.razor *@
+<nav class="nav-menu">
+    <ul>
+        <li>
+            <NavLink href="/" Match="NavLinkMatch.All">
+                <span class="oi oi-home"></span> Accueil
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="/produits" Match="NavLinkMatch.Prefix">
+                <span class="oi oi-list"></span> Produits
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="/marques" Match="NavLinkMatch.Prefix">
+                <span class="oi oi-tag"></span> Marques
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="/typesproduits" Match="NavLinkMatch.Prefix">
+                <span class="oi oi-grid-three-up"></span> Types de produit
+            </NavLink>
+        </li>
+    </ul>
+</nav>
+
+<style>
+    .nav-menu {
+        background-color: #343a40;
+        padding: 1rem;
+    }
+
+    .nav-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-menu li {
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-menu a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .nav-menu a.active {
+        font-weight: bold;
+        border-left: 4px solid #0d6efd;
+        padding-left: 0.5rem;
+    }
+</style>
+
+@code {
+
+}
